@@ -22,7 +22,7 @@ export interface Experience {
 }
 
 // Resource Types
-export type ResourceType = 'scholarship' | 'afterschool' | 'paid'
+export type ResourceType = 'scholarship' | 'afterschool' | 'paid' | 'club-fair' | 'event'
 
 export interface Resource {
   id: string

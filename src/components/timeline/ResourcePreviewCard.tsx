@@ -15,10 +15,12 @@ const urgencyColors = {
   upcoming: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 border-green-300 dark:border-green-700',
 }
 
-const typeLabels = {
+const typeLabels: Record<string, string> = {
   scholarship: 'Scholarship',
   afterschool: 'Afterschool',
   paid: 'Paid Opportunity',
+  'club-fair': 'Club Fair',
+  event: 'Event',
 }
 
 export function ResourcePreviewCard({ resource, onClick }: ResourcePreviewCardProps) {
