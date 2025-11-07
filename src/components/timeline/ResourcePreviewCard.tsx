@@ -9,6 +9,12 @@ interface ResourcePreviewCardProps {
   onClick?: () => void
 }
 
+const urgencyColors = {
+  urgent: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 border-red-300 dark:border-red-700',
+  soon: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 border-yellow-300 dark:border-yellow-700',
+  upcoming: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700',
+}
+
 const typeColors: Record<string, { bg: string; border: string; badge: string }> = {
   scholarship: {
     bg: 'bg-blue-50 dark:bg-blue-950/30',
