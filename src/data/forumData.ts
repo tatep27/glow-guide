@@ -1,4 +1,4 @@
-import { Forum } from '../types'
+import type { Forum } from '../types'
 
 export const forums: Forum[] = [
   {

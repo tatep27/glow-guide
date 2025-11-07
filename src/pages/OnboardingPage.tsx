@@ -1,21 +1,80 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState, useEffect } from 'react'
+import { WelcomeStep } from '@/components/onboarding/WelcomeStep'
+import { GradeSelectionStep } from '@/components/onboarding/GradeSelectionStep'
+import { InterestDiagnosticStep } from '@/components/onboarding/InterestDiagnosticStep'
+import { ResultsStep } from '@/components/onboarding/ResultsStep'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+
+type OnboardingStep = 'welcome' | 'grade' | 'diagnostic' | 'results'
 
 export function OnboardingPage() {
+  const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome')
+  const [selectedGrade, setSelectedGrade] = useLocalStorage<number>('onboarding-grade', 10)
+  const [selectedInterests, setSelectedInterests] = useLocalStorage<string[]>('onboarding-interests', [])
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useLocalStorage<boolean>('onboarding-completed', false)
+
+  // If already completed, redirect to dashboard (handled by App routing)
+  useEffect(() => {
+    if (hasCompletedOnboarding && currentStep === 'welcome') {
+      // Allow re-viewing onboarding, but skip if they want to go to dashboard
+    }
+  }, [hasCompletedOnboarding, currentStep])
+
+  const handleWelcomeNext = () => {
+    setCurrentStep('grade')
+  }
+
+  const handleGradeNext = () => {
+    setCurrentStep('diagnostic')
+  }
+
+  const handleInterestToggle = (interest: string) => {
+    setSelectedInterests((prev) => {
+      if (prev.includes(interest)) {
+        return prev.filter((i) => i !== interest)
+      } else {
+        return [...prev, interest]
+      }
+    })
+  }
+
+  const handleDiagnosticComplete = () => {
+    // For demo, ensure Alex's interests are included
+    const alexInterests = ['Environmental Justice', 'Art']
+    const finalInterests = [...new Set([...selectedInterests, ...alexInterests])]
+    setSelectedInterests(finalInterests)
+    setCurrentStep('results')
+  }
+
+  const handleResultsContinue = () => {
+    setHasCompletedOnboarding(true)
+    // Navigation handled by ResultsStep component
+  }
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-6">Welcome</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Onboarding</CardTitle>
-          <CardDescription>
-            Complete your interest diagnostic to get started
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p>Onboarding flow coming in Phase 1</p>
-        </CardContent>
-      </Card>
+    <div className="min-h-screen bg-background py-12 px-4">
+      {currentStep === 'welcome' && <WelcomeStep onNext={handleWelcomeNext} />}
+      {currentStep === 'grade' && (
+        <GradeSelectionStep
+          selectedGrade={selectedGrade}
+          onGradeSelect={setSelectedGrade}
+          onNext={handleGradeNext}
+        />
+      )}
+      {currentStep === 'diagnostic' && (
+        <InterestDiagnosticStep
+          selectedInterests={selectedInterests}
+          onInterestToggle={handleInterestToggle}
+          onComplete={handleDiagnosticComplete}
+        />
+      )}
+      {currentStep === 'results' && (
+        <ResultsStep
+          selectedInterests={selectedInterests}
+          grade={selectedGrade}
+          onContinue={handleResultsContinue}
+        />
+      )}
     </div>
   )
 }
-

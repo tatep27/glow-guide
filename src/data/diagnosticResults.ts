@@ -1,4 +1,4 @@
-import { InterestDiagnostic } from '../types'
+import type { InterestDiagnostic } from '../types'
 
 export const diagnosticResults: InterestDiagnostic = {
   academicInterests: ['Science', 'English', 'Social Studies'],
