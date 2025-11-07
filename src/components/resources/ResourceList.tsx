@@ -16,16 +16,16 @@ export function ResourceList({ resources, title, showMatchReason = false, onReso
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold">{title}</h2>
         <Badge variant="secondary">{resources.length}</Badge>
       </div>
-      <div className="flex flex-col gap-4 max-w-2xl">
+      <div className="flex flex-col gap-6 w-full">
         {resources.map((resource) => (
-          <div key={resource.id} className="relative">
+          <div key={resource.id} className="relative w-full">
             {showMatchReason && (
-              <div className="absolute -top-2 left-2 z-10">
+              <div className="absolute -top-3 left-4 z-10">
                 <Badge variant="default" className="text-xs">
                   {getMatchReason(resource)}
                 </Badge>

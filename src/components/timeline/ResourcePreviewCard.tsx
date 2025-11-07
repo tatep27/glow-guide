@@ -29,30 +29,30 @@ export function ResourcePreviewCard({ resource, onClick }: ResourcePreviewCardPr
 
   return (
     <Card 
-      className="cursor-pointer hover:shadow-md transition-shadow w-full max-w-sm"
+      className="cursor-pointer hover:shadow-lg transition-all w-full"
       onClick={onClick}
     >
-      <CardContent className="p-4">
-        <div className="space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg">{resource.title}</h3>
-              <Badge variant="outline" className="mt-1 text-xs">
+      <CardContent className="p-6">
+        <div className="space-y-4">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 space-y-2">
+              <h3 className="font-semibold text-xl">{resource.title}</h3>
+              <Badge variant="outline" className="text-sm">
                 {typeLabels[resource.type]}
               </Badge>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2">
+          <p className="text-base text-muted-foreground leading-relaxed">
             {resource.description}
           </p>
           {resource.deadline && (
-            <div className={`flex items-center gap-2 text-xs px-2 py-1 rounded border ${urgencyClass}`}>
-              <Calendar className="h-3 w-3" />
+            <div className={`flex items-center gap-2 text-sm px-3 py-2 rounded border ${urgencyClass}`}>
+              <Calendar className="h-4 w-4" />
               <span>Due: {formatDate(resource.deadline)}</span>
             </div>
           )}
           {!resource.deadline && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <span>Ongoing opportunity</span>
             </div>
           )}
