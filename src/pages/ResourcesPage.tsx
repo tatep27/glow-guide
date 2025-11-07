@@ -85,16 +85,18 @@ export function ResourcesPage() {
   const showRecommended = filteredRecommended.length > 0 && selectedTypes.length === 0 && !searchQuery.trim()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Resource Suggestions</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
+          Resource Suggestions
+        </h1>
+        <p className="text-muted-foreground text-lg">
           Discover opportunities tailored to your interests
         </p>
       </div>
 
       {/* Filters */}
-      <div className="bg-muted p-4 rounded-lg">
+      <div className="bg-gradient-to-r from-muted via-muted/50 to-muted p-6 rounded-lg border-2 border-primary/20">
         <ResourceFilter
           selectedTypes={selectedTypes}
           onTypeToggle={handleTypeToggle}
