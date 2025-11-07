@@ -25,9 +25,9 @@ export function WelcomeStep({ onNext }: WelcomeStepProps) {
               <li>Community forums for questions and support</li>
             </ul>
           </div>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-sm text-muted-foreground">
-              <strong>Note:</strong> You'll be viewing a demo student profile (Alex, 10th grade) to see how the platform works.
+          <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+            <p className="text-sm text-blue-900 dark:text-blue-100">
+              <strong>Demo:</strong> This is a demonstration of the onboarding flow. You'll be viewing a demo student profile (Alex, 10th grade) to see how the platform works.
             </p>
           </div>
           <div className="flex justify-end">

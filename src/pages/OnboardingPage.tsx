@@ -1,15 +1,14 @@
 import { useState, useEffect } from 'react'
 import { WelcomeStep } from '@/components/onboarding/WelcomeStep'
-import { GradeSelectionStep } from '@/components/onboarding/GradeSelectionStep'
 import { InterestDiagnosticStep } from '@/components/onboarding/InterestDiagnosticStep'
 import { ResultsStep } from '@/components/onboarding/ResultsStep'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 
-type OnboardingStep = 'welcome' | 'grade' | 'diagnostic' | 'results'
+type OnboardingStep = 'welcome' | 'diagnostic' | 'results'
 
 export function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome')
-  const [selectedGrade, setSelectedGrade] = useLocalStorage<number>('onboarding-grade', 10)
+  const [selectedGrade] = useLocalStorage<number>('onboarding-grade', 10)
   const [selectedInterests, setSelectedInterests] = useLocalStorage<string[]>('onboarding-interests', [])
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useLocalStorage<boolean>('onboarding-completed', false)
 
@@ -21,10 +20,8 @@ export function OnboardingPage() {
   }, [hasCompletedOnboarding, currentStep])
 
   const handleWelcomeNext = () => {
-    setCurrentStep('grade')
-  }
-
-  const handleGradeNext = () => {
+    // Skip grade selection - go directly to diagnostic
+    // Grade is already set to 10 (Alex's grade) in localStorage
     setCurrentStep('diagnostic')
   }
 
@@ -54,13 +51,6 @@ export function OnboardingPage() {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       {currentStep === 'welcome' && <WelcomeStep onNext={handleWelcomeNext} />}
-      {currentStep === 'grade' && (
-        <GradeSelectionStep
-          selectedGrade={selectedGrade}
-          onGradeSelect={setSelectedGrade}
-          onNext={handleGradeNext}
-        />
-      )}
       {currentStep === 'diagnostic' && (
         <InterestDiagnosticStep
           selectedInterests={selectedInterests}
