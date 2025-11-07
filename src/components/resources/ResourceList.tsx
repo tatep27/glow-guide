@@ -21,7 +21,7 @@ export function ResourceList({ resources, title, showMatchReason = false, onReso
         <h2 className="text-xl font-bold">{title}</h2>
         <Badge variant="secondary">{resources.length}</Badge>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-4 max-w-2xl">
         {resources.map((resource) => (
           <div key={resource.id} className="relative">
             {showMatchReason && (
