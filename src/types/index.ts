@@ -107,3 +107,13 @@ export interface ResumeData {
   activities: string[]
 }
 
+// Goal Types
+export interface Goal {
+  id: string
+  title: string
+  description: string
+  targetDate: string | null // ISO date string, null for ongoing
+  category: 'academic' | 'career' | 'personal' | 'college'
+  icon?: string
+}
+
