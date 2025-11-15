@@ -1,25 +1,9 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Timeline } from '@/components/timeline/Timeline'
-import { ExperienceDetailModal } from '@/components/timeline/ExperienceDetailModal'
-import { experiences } from '@/data/experiences'
-import { resources } from '@/data/resources'
+import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
 import { alexProfile } from '@/data/alexProfile'
-import type { Experience, Resource } from '@/types'
+import { ArrowRight, FileText, Settings } from 'lucide-react'
 
 export function DashboardPage() {
-  const navigate = useNavigate()
-  const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null)
-
-  const handleExperienceClick = (experience: Experience) => {
-    setSelectedExperience(experience)
-  }
-
-  const handleResourceClick = (resource: Resource) => {
-    // Navigate to resources page with the resource ID
-    navigate(`/resources?id=${resource.id}`)
-  }
-
   return (
     <div className="space-y-6">
       <div>
@@ -32,19 +16,64 @@ export function DashboardPage() {
         </p>
       </div>
 
-      <Timeline
-        experiences={experiences}
-        resources={resources}
-        onExperienceClick={handleExperienceClick}
-        onResourceClick={handleResourceClick}
-      />
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
+          <Link to="/timeline">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">View Your Timeline</h3>
+                  <p className="text-muted-foreground">See your journey and explore next steps</p>
+                </div>
+                <ArrowRight className="h-6 w-6 text-primary" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
 
-      {selectedExperience && (
-        <ExperienceDetailModal
-          experience={selectedExperience}
-          onClose={() => setSelectedExperience(null)}
-        />
-      )}
+        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
+          <Link to="/resources">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Browse Resources</h3>
+                  <p className="text-muted-foreground">Find opportunities and scholarships</p>
+                </div>
+                <ArrowRight className="h-6 w-6 text-primary" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
+          <Link to="/resume">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">View Your Resume</h3>
+                  <p className="text-muted-foreground">Review and export your resume</p>
+                </div>
+                <FileText className="h-6 w-6 text-primary" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
+          <Link to="/preferences">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Update Preferences</h3>
+                  <p className="text-muted-foreground">Customize your opportunity recommendations</p>
+                </div>
+                <Settings className="h-6 w-6 text-primary" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+      </div>
     </div>
   )
 }

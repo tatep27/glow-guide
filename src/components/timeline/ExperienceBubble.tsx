@@ -16,23 +16,23 @@ const experienceIcons: Record<Experience['type'], typeof Sparkles> = {
 
 const experienceColors: Record<Experience['type'], { bg: string; border: string; icon: string }> = {
   activity: {
-    bg: 'bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/50 dark:to-purple-900/50',
-    border: 'border-purple-300 dark:border-purple-700',
+    bg: 'bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30',
+    border: 'border-purple-400 dark:border-purple-600',
     icon: 'text-purple-600 dark:text-purple-400',
   },
   volunteer: {
-    bg: 'bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/50 dark:to-green-900/50',
-    border: 'border-green-300 dark:border-green-700',
+    bg: 'bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900/30 dark:to-green-800/30',
+    border: 'border-green-400 dark:border-green-600',
     icon: 'text-green-600 dark:text-green-400',
   },
   work: {
-    bg: 'bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/50 dark:to-blue-900/50',
-    border: 'border-blue-300 dark:border-blue-700',
+    bg: 'bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30',
+    border: 'border-blue-400 dark:border-blue-600',
     icon: 'text-blue-600 dark:text-blue-400',
   },
   award: {
-    bg: 'bg-gradient-to-br from-yellow-50 to-yellow-100 dark:from-yellow-950/50 dark:to-yellow-900/50',
-    border: 'border-yellow-300 dark:border-yellow-700',
+    bg: 'bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900/30 dark:to-yellow-800/30',
+    border: 'border-yellow-400 dark:border-yellow-600',
     icon: 'text-yellow-600 dark:text-yellow-400',
   },
 }
@@ -44,8 +44,9 @@ export function ExperienceBubble({ experience, onClick }: ExperienceBubbleProps)
 
   return (
     <div
-      className={`${colors.bg} border-2 ${colors.border} rounded-xl p-4 cursor-pointer hover:shadow-xl hover:scale-110 transition-all duration-300 max-w-[220px] min-w-[200px] transform hover:-translate-y-1`}
+      className={`${colors.bg} border-3 ${colors.border} rounded-3xl p-5 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 max-w-[280px] min-w-[240px] transform hover:-translate-y-2 shadow-lg`}
       onClick={onClick}
+      style={{ borderWidth: '3px' }}
     >
       <div className="space-y-2">
         <div className="flex items-start gap-2">

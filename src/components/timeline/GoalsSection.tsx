@@ -15,28 +15,28 @@ const goalIcons: Record<Goal['category'], typeof Target> = {
 
 const goalColors: Record<Goal['category'], { bg: string; border: string; icon: string; gradient: string }> = {
   academic: {
-    bg: 'bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950/50 dark:to-indigo-900/50',
-    border: 'border-indigo-300 dark:border-indigo-700',
-    icon: 'text-indigo-600 dark:text-indigo-400',
-    gradient: 'from-indigo-500 to-purple-500',
+    bg: 'bg-gradient-to-br from-lavender/20 to-lavender/40 dark:from-lavender/10 dark:to-lavender/20',
+    border: 'border-primary/40 dark:border-primary/60',
+    icon: 'text-primary dark:text-primary',
+    gradient: 'from-primary to-lavender',
   },
   career: {
-    bg: 'bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/50 dark:to-amber-900/50',
-    border: 'border-amber-300 dark:border-amber-700',
-    icon: 'text-amber-600 dark:text-amber-400',
-    gradient: 'from-amber-500 to-orange-500',
+    bg: 'bg-gradient-to-br from-peach/30 to-peach/50 dark:from-peach/10 dark:to-peach/20',
+    border: 'border-peach/50 dark:border-peach/60',
+    icon: 'text-foreground dark:text-peach',
+    gradient: 'from-peach to-soft-pink',
   },
   personal: {
-    bg: 'bg-gradient-to-br from-pink-50 to-pink-100 dark:from-pink-950/50 dark:to-pink-900/50',
-    border: 'border-pink-300 dark:border-pink-700',
-    icon: 'text-pink-600 dark:text-pink-400',
-    gradient: 'from-pink-500 to-rose-500',
+    bg: 'bg-gradient-to-br from-soft-pink/30 to-soft-pink/50 dark:from-soft-pink/10 dark:to-soft-pink/20',
+    border: 'border-soft-pink/50 dark:border-soft-pink/60',
+    icon: 'text-foreground dark:text-soft-pink',
+    gradient: 'from-soft-pink to-peach',
   },
   college: {
-    bg: 'bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950/50 dark:to-emerald-900/50',
-    border: 'border-emerald-300 dark:border-emerald-700',
-    icon: 'text-emerald-600 dark:text-emerald-400',
-    gradient: 'from-emerald-500 to-teal-500',
+    bg: 'bg-gradient-to-br from-mint/30 to-mint/50 dark:from-mint/10 dark:to-mint/20',
+    border: 'border-accent/50 dark:border-accent/60',
+    icon: 'text-accent-foreground dark:text-accent',
+    gradient: 'from-mint to-sky-blue',
   },
 }
 
@@ -44,7 +44,7 @@ export function GoalsSection({ goals }: GoalsSectionProps) {
   return (
     <div className="mt-16 mb-8">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent">
+        <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary via-lavender to-accent bg-clip-text text-transparent">
           Your Goals
         </h2>
         <p className="text-muted-foreground text-lg">
@@ -59,7 +59,8 @@ export function GoalsSection({ goals }: GoalsSectionProps) {
           return (
             <div
               key={goal.id}
-              className={`${colors.bg} border-2 ${colors.border} rounded-xl p-6 hover:shadow-xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-1`}
+              className={`${colors.bg} border-3 ${colors.border} rounded-3xl p-6 hover:shadow-2xl hover:scale-105 transition-all duration-300 transform hover:-translate-y-2 shadow-lg`}
+              style={{ borderWidth: '3px' }}
             >
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -95,5 +96,6 @@ export function GoalsSection({ goals }: GoalsSectionProps) {
     </div>
   )
 }
+
 
 

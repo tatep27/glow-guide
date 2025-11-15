@@ -1,231 +1,327 @@
-import { useEffect, useRef, useMemo } from 'react'
-import { ExperienceBubble } from './ExperienceBubble'
-import { ResourceGroupPreview } from './ResourceGroupPreview'
-import { GoalsSection } from './GoalsSection'
-import type { Experience, Resource, Goal } from '@/types'
+import { useMemo, useRef, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
+import { TimelineCard } from './TimelineCard'
+import { SpecialEventMarker } from './SpecialEventMarker'
+import { TimelinePathSVG, getTimelinePath } from './TimelinePath'
+import type { Experience, Resource } from '@/types'
 import { alexProfile } from '@/data/alexProfile'
-import { alexGoals } from '@/data/goals'
+import { specialEvents } from '@/data/specialEvents'
 
 interface TimelineProps {
   experiences: Experience[]
   resources: Resource[]
-  goals?: Goal[]
   onExperienceClick?: (experience: Experience) => void
   onResourceClick?: (resource: Resource) => void
 }
 
-const grades = [9, 10, 11, 12] as const
+// Calculate position along path (0 to 1) based on grade level
+const getGradePosition = (gradeLevel: number): number => {
+  return (gradeLevel - 9) / 3 // 9th = 0, 10th = 0.33, 11th = 0.66, 12th = 1.0
+}
 
-export function Timeline({ experiences, resources, goals = alexGoals, onExperienceClick, onResourceClick }: TimelineProps) {
-  const timelineRef = useRef<HTMLDivElement>(null)
+export function Timeline({ experiences, resources, onExperienceClick, onResourceClick }: TimelineProps) {
+  const navigate = useNavigate()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [dimensions, setDimensions] = useState({ width: 2000, height: 400 })
   const currentGrade = alexProfile.grade
+
+  // Update dimensions on mount and resize - make timeline take full width
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const container = containerRef.current
+        const parentWidth = container.parentElement?.clientWidth || window.innerWidth
+        // Calculate width to take full horizontal space with padding for cards
+        const calculatedWidth = Math.max(parentWidth - 100, 2000) // Ensure minimum width
+        setDimensions({
+          width: calculatedWidth,
+          height: 400,
+        })
+      }
+    }
+    updateDimensions()
+    window.addEventListener('resize', updateDimensions)
+    return () => window.removeEventListener('resize', updateDimensions)
+  }, [])
+
+  // Filter experiences: past (before or at current grade) and suggested (resources)
+  const pastExperiences = useMemo(() => {
+    return experiences.filter(exp => exp.gradeLevel <= currentGrade)
+  }, [experiences, currentGrade])
+
+  const suggestedResources = useMemo(() => {
+    // Filter resources that are upcoming (deadline in future or no deadline)
+    // For resources without deadlines, assign a default deadline 90 days from now
+    return resources
+      .map(res => {
+        if (!res.deadline) {
+          // Assign a default deadline 90 days from now for sorting
+          return { ...res, deadline: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] }
+        }
+        return res
+      })
+      .filter(res => {
+        const deadlineDate = new Date(res.deadline!)
+        return deadlineDate > new Date()
+      })
+      .slice(0, 6) // Limit to 6 suggested resources
+  }, [resources])
+
+  // Get special events for timeline
+  const timelineEvents = useMemo(() => {
+    return specialEvents.filter(event => event.gradeLevel >= currentGrade || event.gradeLevel === currentGrade)
+  }, [currentGrade])
+
+  // Get path helper functions
+  const pathHelpers = useMemo(() => {
+    return getTimelinePath({ 
+      width: dimensions.width, 
+      height: dimensions.height
+    })
+  }, [dimensions.width, dimensions.height])
+
+  // Calculate card positions with collision detection to prevent overlap
+  const getCardPosition = (index: number, total: number, isPast: boolean, existingPositions: Array<{ x: number; y: number }> = []) => {
+    const baseT = isPast 
+      ? (index / Math.max(total, 1)) * getGradePosition(currentGrade)
+      : getGradePosition(currentGrade) + ((index + 1) / (suggestedResources.length + 1)) * (1 - getGradePosition(currentGrade))
+    
+    const point = pathHelpers.getPointOnPath(baseT)
+    
+    // Try different vertical offsets to avoid overlap
+    let verticalOffset = (index % 2 === 0 ? -1 : 1) * (120 + (index % 3) * 40)
+    let attempts = 0
+    const minDistance = 280 // Minimum distance between cards (increased for better spacing)
+    
+    // Check for collisions and adjust position
+    while (attempts < 10) {
+      const testX = point.x
+      const testY = point.y + verticalOffset
+      
+      const hasCollision = existingPositions.some(pos => {
+        const distance = Math.sqrt(Math.pow(pos.x - testX, 2) + Math.pow(pos.y - testY, 2))
+        return distance < minDistance
+      })
+      
+      if (!hasCollision) {
+        break
+      }
+      
+      // Try different offset
+      verticalOffset = (index % 2 === 0 ? -1 : 1) * (120 + (index % 3) * 40 + attempts * 50)
+      attempts++
+    }
+    
+    return {
+      x: point.x,
+      y: point.y + verticalOffset,
+      pathT: baseT,
+    }
+  }
 
   // Scroll to current position on mount
   useEffect(() => {
-    if (timelineRef.current) {
-      // Scroll to show current grade (10th grade = index 1, so ~33% of width)
-      const scrollPosition = (currentGrade - 9) * (100 / 4) - 15
-      timelineRef.current.scrollLeft = (timelineRef.current.scrollWidth * scrollPosition) / 100
+    if (containerRef.current) {
+      const currentPosition = getGradePosition(currentGrade)
+      const scrollPosition = (containerRef.current.scrollWidth * currentPosition) / 100
+      containerRef.current.scrollLeft = scrollPosition - 200 // Offset to center view
     }
-  }, [currentGrade])
+  }, [currentGrade, dimensions.width])
 
-  // Filter resources to show upcoming ones
-  const upcomingResources = useMemo(() => {
-    return resources.filter((res) => {
-      if (!res.deadline) return true
-      const deadlineDate = new Date(res.deadline)
-      return deadlineDate > new Date()
-    })
-  }, [resources])
-
-  // Group resources by type
-  const resourcesByType = useMemo(() => {
-    const grouped: Record<string, Resource[]> = {}
-    upcomingResources.forEach((res) => {
-      if (!grouped[res.type]) {
-        grouped[res.type] = []
-      }
-      grouped[res.type].push(res)
-    })
-    return grouped
-  }, [upcomingResources])
-
-  // Calculate positions for resource groups along timeline
-  const getResourceGroupPosition = (index: number): { position: number; side: 'above' | 'below' } => {
-    const basePositions = [33, 50, 66, 83]
-    const position = basePositions[index % basePositions.length]
-    const side = index % 2 === 0 ? 'above' : 'below'
-    return { position, side }
+  const handleKeepGoing = () => {
+    navigate('/explore-careers')
   }
-
-  // Position experiences along timeline (past/current)
-  const getExperiencePosition = (experience: Experience): number => {
-    const gradePositions: Record<number, number> = {
-      9: 0,
-      10: 33,
-      11: 66,
-      12: 100,
-    }
-    return gradePositions[experience.gradeLevel] || 0
-  }
-
-  const resourceTypes = Object.keys(resourcesByType)
 
   return (
     <div className="w-full">
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-          Your Journey
-        </h2>
-        <p className="text-muted-foreground text-lg">
-          Track your progress from 9th grade through graduation and beyond
+      {/* Student-facing description */}
+      <div className="mb-8 p-6 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl border-2 border-primary/20">
+        <h2 className="text-2xl font-bold mb-3 text-foreground">Timeline View</h2>
+        <p className="text-muted-foreground leading-relaxed">
+          In the timeline view, see upcoming opportunities and important dates. Click on any card to learn more. Visit the career exploration at the end of the timeline to see where your journey could lead!
         </p>
       </div>
 
-      {/* Scrollable Container with proper padding to prevent cutoff */}
-      <div className="relative">
+      {/* Scrollable Timeline Container with border and padding */}
+      <div className="border-3 border-primary/30 rounded-3xl p-8 bg-card/50">
         <div
-          ref={timelineRef}
-          className="overflow-x-auto overflow-y-visible pb-40 pt-40 scroll-smooth"
+          ref={containerRef}
+          className="relative overflow-x-auto overflow-y-visible pb-32 pt-20 scroll-smooth w-full"
           style={{ scrollbarWidth: 'thin' }}
         >
-          <div className="relative min-w-[1800px] h-[500px] px-20">
-            {/* Main Timeline Line with gradient */}
-            <div className="absolute top-1/2 left-20 right-20 h-2 bg-gradient-to-r from-purple-400 via-primary to-emerald-400 transform -translate-y-1/2 z-10 rounded-full shadow-lg" />
-            {/* Animated progress indicator */}
-            <div 
-              className="absolute top-1/2 left-20 h-2 bg-gradient-to-r from-primary via-primary/80 to-emerald-400 transform -translate-y-1/2 z-11 rounded-full transition-all duration-1000"
-              style={{ width: `${((currentGrade - 9) / 3) * 100}%` }}
+        <div 
+          className="relative"
+          style={{ 
+            width: `${dimensions.width + 300}px`, // Add padding to total width
+            height: `${dimensions.height}px`,
+            minHeight: '600px',
+            paddingLeft: '150px', // Add left padding so cards aren't cut off
+            paddingRight: '150px', // Add right padding
+          }}
+        >
+          {/* SVG Path - offset by padding */}
+          <div style={{ position: 'absolute', left: '150px', top: 0 }}>
+            <TimelinePathSVG 
+              width={dimensions.width} 
+              height={dimensions.height} 
+              currentGrade={currentGrade}
             />
+          </div>
 
-            {/* Grade Markers */}
-            {grades.map((grade, index) => {
-              const isCurrent = grade === currentGrade
-              const isPast = grade < currentGrade
-              const position = (index / (grades.length - 1)) * 100
-              const leftPosition = 20 + (position / 100) * (100 - (40 / 1800) * 100)
-
-              return (
-                <div
-                  key={grade}
-                  className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 z-20"
-                  style={{ left: `${leftPosition}%` }}
-                >
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`rounded-full border-3 transition-all duration-300 ${
-                        isCurrent
-                          ? 'w-8 h-8 bg-gradient-to-br from-primary to-primary/80 border-primary scale-125 shadow-xl shadow-primary/50 animate-pulse'
-                          : isPast
-                          ? 'w-6 h-6 bg-gradient-to-br from-emerald-400 to-emerald-600 border-emerald-500 shadow-lg'
-                          : 'w-5 h-5 bg-background border-primary/40'
-                      }`}
-                      style={{ borderWidth: '3px' }}
-                    />
-                    <span
-                      className={`mt-3 text-sm font-bold whitespace-nowrap ${
-                        isCurrent 
-                          ? 'text-primary scale-110' 
-                          : isPast 
-                          ? 'text-emerald-600 dark:text-emerald-400' 
-                          : 'text-muted-foreground'
-                      } transition-all`}
-                    >
-                      {grade === 9 && '9th Grade'}
-                      {grade === 10 && '10th Grade'}
-                      {grade === 11 && '11th Grade'}
-                      {grade === 12 && '12th Grade'}
-                    </span>
-                    {isCurrent && (
-                      <div className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2">
-                        <div className="w-0.5 h-10 bg-gradient-to-b from-primary/60 to-transparent" />
-                        <span className="absolute top-10 left-1/2 transform -translate-x-1/2 text-xs text-primary font-bold whitespace-nowrap bg-background px-2 py-1 rounded-full border border-primary/30 shadow-md">
-                          ✨ You are here
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-
-            {/* Experiences (Past/Current) - Positioned along timeline */}
-            {experiences.map((experience, index) => {
-              const position = getExperiencePosition(experience)
-              const side = index % 2 === 0 ? 'above' : 'below'
-              const leftPosition = 20 + (position / 100) * (100 - (40 / 1800) * 100)
+          {/* Past Experience Cards */}
+          {(() => {
+            // Calculate all experience positions first to avoid recursive calls
+            const experiencePositions: Array<{ x: number; y: number; pathT: number }> = []
+            pastExperiences.forEach((_, index) => {
+              const previousPositions = experiencePositions.map(p => ({ x: p.x, y: p.y }))
+              const pos = getCardPosition(index, pastExperiences.length, true, previousPositions)
+              experiencePositions.push(pos)
+            })
+            
+            return pastExperiences.map((experience, index) => {
+              const position = experiencePositions[index]
+            // Adjust for padding offset
+            const adjustedPosition = { x: position.x + 150, y: position.y }
 
               return (
                 <div
                   key={experience.id}
-                  className="absolute transform -translate-x-1/2 z-30"
-                  style={{
-                    left: `${leftPosition}%`,
-                    [side === 'above' ? 'bottom' : 'top']: side === 'above' ? 'calc(50% + 60px)' : 'calc(50% + 60px)',
-                    animation: `fadeIn 0.5s ease-out ${index * 100}ms forwards`,
-                    opacity: 0,
-                  }}
-                >
-                  <div className="relative flex flex-col items-center">
-                    {/* Connection Line with gradient */}
-                    <div
-                      className={`w-1 ${side === 'above' ? 'h-14 mb-2' : 'h-14 mb-2'} bg-gradient-to-b from-primary/50 to-primary/20 rounded-full`}
-                    />
-                    {/* Experience Bubble */}
-                    <ExperienceBubble
-                      experience={experience}
+                className="absolute z-10"
+                style={{
+                  left: `${adjustedPosition.x}px`,
+                  top: `${adjustedPosition.y}px`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <TimelineCard
+                  type="experience"
+                  data={experience}
                       onClick={() => onExperienceClick?.(experience)}
                     />
-                  </div>
                 </div>
               )
-            })}
+            })
+          })()}
 
-            {/* Resource Groups - Positioned along timeline */}
-            {resourceTypes.map((type, index) => {
-              const groupResources = resourcesByType[type]
-              const { position, side } = getResourceGroupPosition(index)
-              const leftPosition = 20 + (position / 100) * (100 - (40 / 1800) * 100)
-
-              return (
-                <ResourceGroupPreview
-                  key={type}
-                  type={type}
-                  resources={groupResources}
-                  position={leftPosition}
-                  side={side}
+          {/* Suggested Resource Cards */}
+          {(() => {
+            // Calculate all experience positions first
+            const experiencePositions: Array<{ x: number; y: number }> = []
+            pastExperiences.forEach((_, index) => {
+              const previousPositions = experiencePositions.map(p => ({ x: p.x, y: p.y }))
+              const pos = getCardPosition(index, pastExperiences.length, true, previousPositions)
+              experiencePositions.push({ x: pos.x, y: pos.y })
+            })
+            
+            // Calculate all resource positions
+            const resourcePositions: Array<{ x: number; y: number; pathT: number }> = []
+            suggestedResources.forEach((_, index) => {
+              const previousPositions = [...experiencePositions, ...resourcePositions.map(p => ({ x: p.x, y: p.y }))]
+              const pos = getCardPosition(index, suggestedResources.length, false, previousPositions)
+              resourcePositions.push(pos)
+            })
+            
+            return suggestedResources.map((resource, index) => {
+              const position = resourcePositions[index]
+            // Adjust for padding offset
+            const adjustedPosition = { x: position.x + 150, y: position.y }
+            
+            return (
+              <div
+                key={resource.id}
+                className="absolute z-10"
+                style={{
+                  left: `${adjustedPosition.x}px`,
+                  top: `${adjustedPosition.y}px`,
+                  transform: 'translate(-50%, -50%)',
+                }}
+              >
+                <TimelineCard
+                  type="resource"
+                  data={resource}
                   onResourceClick={onResourceClick}
                 />
+              </div>
+            )
+            })
+          })()}
+
+          {/* Special Event Markers */}
+          {(() => {
+            // Group events by grade level and position them to avoid overlap
+            const eventsByGrade = timelineEvents.reduce((acc, event) => {
+              const grade = event.gradeLevel
+              if (!acc[grade]) acc[grade] = []
+              acc[grade].push(event)
+              return acc
+            }, {} as Record<number, typeof timelineEvents>)
+            
+            // Timeline center Y is always at dimensions.height / 2
+            const timelineCenterY = dimensions.height / 2
+            
+            return timelineEvents.map((event) => {
+              // For graduation events at 12th grade, position to the left of the grade marker
+              let t = getGradePosition(event.gradeLevel)
+              if (event.title === 'Graduation' && event.gradeLevel === 12) {
+                // Position graduation slightly to the left of the 12th grade marker (t = 1.0)
+                t = 0.92 // Position at 92% of the way, leaving space before the 12th grade marker
+              }
+              const point = pathHelpers.getPointOnPath(t)
+              
+              // Get all events at the same grade level
+              const sameGradeEvents = eventsByGrade[event.gradeLevel] || []
+              const eventIndex = sameGradeEvents.findIndex(e => e.id === event.id)
+              
+              // Space events horizontally to avoid overlap - increased spacing significantly
+              // Each event gets a position offset based on its index
+              const spacing = 250 // Much larger space between events
+              let offsetX = eventIndex * spacing - (sameGradeEvents.length - 1) * spacing / 2
+              
+              // For graduation, ensure it's positioned to the left (negative offset)
+              if (event.title === 'Graduation' && event.gradeLevel === 12) {
+                offsetX = -150 // Position to the left of the grade marker
+              }
+              
+              // Force stars to be EXACTLY on the timeline line (center Y)
+              // Use the exact center Y from dimensions, not from path point
+              const starY = timelineCenterY
+              
+              // Labels will be positioned above or below based on index to avoid grade labels
+              const isAbove = eventIndex % 2 === 0
+              
+              // Offset SAT events more to avoid grade dots
+              const satOffset = event.type === 'sat' ? 80 : 0
+              
+              return (
+                <SpecialEventMarker
+                  key={event.id}
+                  event={event}
+                  position={{ x: point.x + offsetX + satOffset + 150, y: starY }}
+                  isAboveTimeline={isAbove}
+                />
               )
-            })}
-          </div>
-        </div>
-      </div>
+            })
+          })()}
 
-      {/* Goals Section */}
-      <GoalsSection goals={goals} />
-
-      {/* Enhanced Legend */}
-      <div className="mt-8 p-6 bg-gradient-to-r from-muted via-muted/50 to-muted rounded-xl border-2 border-primary/20">
-        <h3 className="text-lg font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-          Timeline Guide
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-primary to-primary/80 border-2 border-primary shadow-md" />
-            <span className="font-medium">Current Grade</span>
+          {/* "Explore what could be next!" Button at end of 12th grade */}
+          <div
+            className="absolute z-20"
+            style={{
+              left: `${dimensions.width - 100 + 150}px`, // Adjust for padding
+              top: `${dimensions.height / 2 - 200}px`, // Moved up more
+              transform: 'translateY(-50%)',
+            }}
+          >
+            <button
+              onClick={handleKeepGoing}
+              className="flex flex-col items-center gap-1.5 bg-primary text-primary-foreground px-4 py-2.5 rounded-2xl shadow-2xl hover:scale-110 transition-all duration-300 border-3 border-primary-foreground/20"
+              style={{ borderWidth: '3px' }}
+            >
+              <span className="font-bold text-sm">Explore what could be next!</span>
+              <ArrowRight className="h-4 w-4 animate-pulse" />
+            </button>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 border-2 border-emerald-500" />
-            <span className="font-medium">Completed</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-background border-2 border-primary/40" />
-            <span className="font-medium">Upcoming</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-12 h-1 bg-gradient-to-r from-purple-400 via-primary to-emerald-400 rounded-full" />
-            <span className="font-medium">Your Journey</span>
           </div>
         </div>
       </div>

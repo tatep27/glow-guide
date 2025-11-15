@@ -10,6 +10,7 @@ export const experiences: Experience[] = [
     tags: ['Environmental Justice', 'Leadership', 'Community Service'],
     type: 'activity',
     gradeLevel: 9,
+    emoji: '🌱',
   },
   {
     id: 'exp-2',
@@ -20,6 +21,7 @@ export const experiences: Experience[] = [
     tags: ['Art', 'Creativity', 'Visual Arts'],
     type: 'activity',
     gradeLevel: 9,
+    emoji: '🎨',
   },
   {
     id: 'exp-3',
@@ -30,6 +32,7 @@ export const experiences: Experience[] = [
     tags: ['Environmental Justice', 'Community Service', 'Education'],
     type: 'volunteer',
     gradeLevel: 10,
+    emoji: '🌿',
   },
   {
     id: 'exp-4',
@@ -40,6 +43,7 @@ export const experiences: Experience[] = [
     tags: ['Writing', 'Journalism', 'Environmental Justice', 'Communication'],
     type: 'activity',
     gradeLevel: 9,
+    emoji: '✍️',
   },
 ]
 
