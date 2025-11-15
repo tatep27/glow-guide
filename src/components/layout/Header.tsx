@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { useViewMode } from '@/hooks/useViewMode'
 
 export function Header() {
-  const { viewMode, toggleViewMode, isStudentView } = useViewMode()
+  const { toggleViewMode, isStudentView } = useViewMode()
 
   const handleToggle = () => {
     toggleViewMode()
