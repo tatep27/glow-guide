@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { alexProfile } from '@/data/alexProfile'
-import { ArrowRight, FileText, Settings } from 'lucide-react'
+import { ArrowRight, FileText, Settings, Plus } from 'lucide-react'
 
 export function DashboardPage() {
   return (
@@ -18,6 +18,20 @@ export function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
+          <Link to="/add-experience">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold mb-2">Add New Experience</h3>
+                  <p className="text-muted-foreground">Document activities, volunteer work, jobs, or awards</p>
+                </div>
+                <Plus className="h-6 w-6 text-primary" />
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
         <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
           <Link to="/timeline">
             <CardContent className="p-6">

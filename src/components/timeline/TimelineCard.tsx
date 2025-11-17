@@ -1,9 +1,7 @@
-import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import type { Experience, Resource } from '@/types'
 import { formatDateRange } from '@/lib/dateUtils'
 import { format } from 'date-fns'
-import { ExperienceDetailModal } from './ExperienceDetailModal'
 
 interface TimelineCardProps {
   type: 'experience' | 'resource'
@@ -55,15 +53,12 @@ const typeColors: Record<string, { bg: string; border: string }> = {
 }
 
 export function TimelineCard({ type, data, onClick, onResourceClick }: TimelineCardProps) {
-  const [showDetailModal, setShowDetailModal] = useState(false)
-
   const colors = type === 'experience' 
     ? typeColors[(data as Experience).type]
     : typeColors[(data as Resource).type]
 
   const handleClick = () => {
     if (type === 'experience') {
-      setShowDetailModal(true)
       onClick?.()
     } else {
       onResourceClick?.(data as Resource)
@@ -71,14 +66,13 @@ export function TimelineCard({ type, data, onClick, onResourceClick }: TimelineC
   }
 
   return (
-    <>
-      <div className="relative">
-        {/* Compact Card */}
-        <Card
-          className={`${colors.bg} ${colors.border} border-3 rounded-3xl p-4 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 w-[200px] shadow-lg`}
-          onClick={handleClick}
-          style={{ borderWidth: '3px' }}
-        >
+    <div className="relative">
+      {/* Compact Card */}
+      <Card
+        className={`${colors.bg} ${colors.border} border-3 rounded-3xl p-4 cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 w-[200px] shadow-lg`}
+        onClick={handleClick}
+        style={{ borderWidth: '3px' }}
+      >
           <CardContent className="p-0">
             <div className="flex flex-col items-center text-center space-y-2">
               {/* Emoji */}
@@ -123,16 +117,7 @@ export function TimelineCard({ type, data, onClick, onResourceClick }: TimelineC
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Detail Modal for Experiences */}
-      {type === 'experience' && showDetailModal && (
-        <ExperienceDetailModal
-          experience={data as Experience}
-          onClose={() => setShowDetailModal(false)}
-        />
-      )}
-    </>
+    </div>
   )
 }
 

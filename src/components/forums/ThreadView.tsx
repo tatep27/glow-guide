@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ThumbsUp, MessageSquare, ArrowLeft } from 'lucide-react'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import { useViewMode } from '@/hooks/useViewMode'
+import { getAuthorDisplayName } from '@/lib/forumUtils'
 import type { ForumThread, ForumPost } from '@/types'
 
 interface ThreadViewProps {
@@ -16,6 +18,7 @@ interface ThreadViewProps {
 }
 
 export function ThreadView({ thread, forumTitle, onBack, onPostReply, onLikePost, likedPosts }: ThreadViewProps) {
+  const { isAdminView } = useViewMode()
   const [replyContent, setReplyContent] = useState('')
   const [replyingTo, setReplyingTo] = useState<string | null>(null)
 
@@ -68,6 +71,7 @@ export function ThreadView({ thread, forumTitle, onBack, onPostReply, onLikePost
                 replyContent={replyContent}
                 onReplyContentChange={setReplyContent}
                 onSubmitReply={handleSubmitReply}
+                isAdminView={isAdminView}
               />
             ))}
           </div>
@@ -104,6 +108,7 @@ interface PostTreeProps {
   replyContent: string
   onReplyContentChange: (content: string) => void
   onSubmitReply: () => void
+  isAdminView: boolean
 }
 
 function PostTree({
@@ -117,9 +122,11 @@ function PostTree({
   replyContent,
   onReplyContentChange,
   onSubmitReply,
+  isAdminView,
 }: PostTreeProps) {
   const isLiked = likedPosts.has(post.id)
   const postDate = parseISO(post.timestamp)
+  const displayName = getAuthorDisplayName(post.authorId, post.authorName, isAdminView)
 
   return (
     <div className="space-y-4">
@@ -128,7 +135,7 @@ function PostTree({
           <div>
             <div className="flex items-center gap-2">
               <span className={`font-semibold ${post.isCounselor ? 'text-blue-700 dark:text-blue-300' : ''}`}>
-                {post.authorName}
+                {displayName}
               </span>
               {post.isCounselor && (
                 <Badge variant="default" className="text-xs">Counselor</Badge>
@@ -193,6 +200,7 @@ function PostTree({
               replyContent={replyContent}
               onReplyContentChange={onReplyContentChange}
               onSubmitReply={onSubmitReply}
+              isAdminView={isAdminView}
             />
           ))}
         </div>

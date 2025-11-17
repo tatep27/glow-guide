@@ -3,11 +3,12 @@ import { Timeline } from '@/components/timeline/Timeline'
 import { ExperienceDetailModal } from '@/components/timeline/ExperienceDetailModal'
 import { ResourceDetail } from '@/components/resources/ResourceDetail'
 import { X } from 'lucide-react'
-import { experiences } from '@/data/experiences'
+import { useExperiences } from '@/hooks/useExperiences'
 import { resources } from '@/data/resources'
 import type { Experience, Resource } from '@/types'
 
 export function TimelinePage() {
+  const { experiences } = useExperiences()
   const [selectedExperience, setSelectedExperience] = useState<Experience | null>(null)
   const [selectedResource, setSelectedResource] = useState<Resource | null>(null)
 

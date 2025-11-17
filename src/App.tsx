@@ -10,6 +10,8 @@ import { OnboardingPage } from './pages/OnboardingPage'
 import { PreferencesPage } from './pages/PreferencesPage'
 import { OnboardingGuard } from './components/onboarding/OnboardingGuard'
 import { AdminDashboardPage } from './pages/AdminDashboardPage'
+import { AddExperiencePage } from './pages/AddExperiencePage'
+import { WelcomeModal } from './components/WelcomeModal'
 import { useViewMode } from './hooks/useViewMode'
 
 function ViewGuard({ children, requiredView }: { children: React.ReactNode; requiredView: 'student' | 'admin' }) {
@@ -29,6 +31,7 @@ function ViewGuard({ children, requiredView }: { children: React.ReactNode; requ
 function App() {
   return (
     <BrowserRouter>
+      <WelcomeModal />
       <Routes>
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route
@@ -90,6 +93,14 @@ function App() {
                     element={
                       <ViewGuard requiredView="student">
                         <PreferencesPage />
+                      </ViewGuard>
+                    }
+                  />
+                  <Route
+                    path="/add-experience"
+                    element={
+                      <ViewGuard requiredView="student">
+                        <AddExperiencePage />
                       </ViewGuard>
                     }
                   />

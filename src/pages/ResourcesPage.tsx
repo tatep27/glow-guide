@@ -5,9 +5,11 @@ import { ResourceList } from '@/components/resources/ResourceList'
 import { ResourceDetail } from '@/components/resources/ResourceDetail'
 import { resources } from '@/data/resources'
 import { getPersonalizedResources } from '@/lib/personalization'
+import { useExperiences } from '@/hooks/useExperiences'
 import type { Resource, ResourceType } from '@/types'
 
 export function ResourcesPage() {
+  const { experiences } = useExperiences()
   const [searchParams, setSearchParams] = useSearchParams()
   const [selectedTypes, setSelectedTypes] = useState<ResourceType[]>([])
   const [searchQuery, setSearchQuery] = useState('')
@@ -26,7 +28,7 @@ export function ResourcesPage() {
   }, [searchParams, setSearchParams])
 
   // Get personalized resources
-  const { recommended, all } = useMemo(() => getPersonalizedResources(resources), [])
+  const { recommended, all } = useMemo(() => getPersonalizedResources(resources, experiences), [experiences])
 
   // Filter resources
   const filteredResources = useMemo(() => {

@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, ExternalLink, Clock } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { careerSuggestions } from '@/data/careerSuggestions'
-import { experiences } from '@/data/experiences'
+import { useExperiences } from '@/hooks/useExperiences'
 import type { CareerSuggestion, Experience } from '@/types'
 
 function CareerCard({ career, experiences }: { career: CareerSuggestion; experiences: Experience[] }) {
@@ -156,6 +156,8 @@ function CareerCard({ career, experiences }: { career: CareerSuggestion; experie
 }
 
 export function ExploreCareersPage() {
+  const { experiences } = useExperiences()
+  
   return (
     <div className="space-y-6">
       <div className="mb-8">

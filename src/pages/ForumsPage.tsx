@@ -5,6 +5,7 @@ import { ThreadView } from '@/components/forums/ThreadView'
 import { forums } from '@/data/forumData'
 import type { Forum, ForumThread, ForumPost } from '@/types'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useViewMode } from '@/hooks/useViewMode'
 
 // Generate anonymous student ID for demo
 function generateAnonymousId(): string {
@@ -18,6 +19,7 @@ function generateAnonymousId(): string {
 }
 
 export function ForumsPage() {
+  const { isAdminView } = useViewMode()
   const [selectedForum, setSelectedForum] = useState<Forum | null>(null)
   const [selectedThreadId, setSelectedThreadId] = useState<string | null>(null)
   const [anonymousId] = useLocalStorage<string>('anonymous-student-id', generateAnonymousId())
@@ -143,6 +145,28 @@ export function ForumsPage() {
     setSelectedThreadId(selectedThread.id)
   }
 
+  const handleCreateForum = () => {
+    // For now, we'll use a simple prompt. In a real app, this would open a modal/form
+    const title = prompt('Enter forum title:')
+    if (!title || !title.trim()) return
+
+    const description = prompt('Enter forum description:')
+    if (!description || !description.trim()) return
+
+    // Get counselor name (in a real app, this would come from auth)
+    const counselorName = 'Counselor Smith' // This could be from user context
+
+    const newForum: Forum = {
+      id: `forum-${Date.now()}`,
+      title: title.trim(),
+      description: description.trim(),
+      createdBy: counselorName,
+      threads: [],
+    }
+
+    setForumData((prev) => [...prev, newForum])
+  }
+
   // Show thread view
   if (selectedThread) {
     return (
@@ -170,5 +194,12 @@ export function ForumsPage() {
   }
 
   // Show forum list
-  return <ForumListView forums={forumData} onForumSelect={handleForumSelect} />
+  return (
+    <ForumListView 
+      forums={forumData} 
+      onForumSelect={handleForumSelect}
+      showCreateButton={isAdminView}
+      onCreateForum={handleCreateForum}
+    />
+  )
 }

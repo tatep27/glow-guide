@@ -1,9 +1,8 @@
-import type { Resource } from '@/types'
+import type { Resource, Experience } from '@/types'
 import { alexProfile } from '@/data/alexProfile'
 import { diagnosticResults } from '@/data/diagnosticResults'
-import { experiences } from '@/data/experiences'
 
-export function getPersonalizedResources(resources: Resource[]): {
+export function getPersonalizedResources(resources: Resource[], experiences: Experience[]): {
   recommended: Resource[]
   all: Resource[]
 } {

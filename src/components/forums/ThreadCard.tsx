@@ -2,6 +2,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MessageSquare, ThumbsUp } from 'lucide-react'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import { useViewMode } from '@/hooks/useViewMode'
+import { getAuthorDisplayName } from '@/lib/forumUtils'
 import type { ForumThread } from '@/types'
 
 interface ThreadCardProps {

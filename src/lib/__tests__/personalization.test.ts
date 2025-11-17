@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { getPersonalizedResources, getMatchReason } from '../personalization'
 import { resources } from '@/data/resources'
+import { experiences } from '@/data/experiences'
 
 describe('personalization', () => {
   describe('getPersonalizedResources', () => {
     it('returns recommended and all resources', () => {
-      const result = getPersonalizedResources(resources)
+      const result = getPersonalizedResources(resources, experiences)
       
       expect(result).toHaveProperty('recommended')
       expect(result).toHaveProperty('all')
@@ -14,7 +15,7 @@ describe('personalization', () => {
     })
 
     it('recommended resources are a subset of all resources', () => {
-      const { recommended, all } = getPersonalizedResources(resources)
+      const { recommended, all } = getPersonalizedResources(resources, experiences)
       
       recommended.forEach((rec) => {
         expect(all).toContainEqual(rec)
@@ -22,7 +23,7 @@ describe('personalization', () => {
     })
 
     it('recommended resources are prioritized', () => {
-      const { recommended } = getPersonalizedResources(resources)
+      const { recommended } = getPersonalizedResources(resources, experiences)
       
       // Should have some recommended resources (at least for Environmental Justice and Art)
       expect(recommended.length).toBeGreaterThan(0)

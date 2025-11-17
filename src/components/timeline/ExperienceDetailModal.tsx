@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,13 +14,40 @@ interface ExperienceDetailModalProps {
 export function ExperienceDetailModal({ experience, onClose }: ExperienceDetailModalProps) {
   const dateRange = formatDateRange(experience.startDate, experience.endDate)
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleEscape)
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = 'unset'
+    }
+  }, [onClose])
+
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <Card className="max-w-2xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" 
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="experience-title"
+    >
+      <Card 
+        className="max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" 
+        onClick={(e) => e.stopPropagation()}
+      >
         <CardHeader>
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-2xl mb-2">{experience.title}</CardTitle>
+              <CardTitle id="experience-title" className="text-2xl mb-2">{experience.title}</CardTitle>
               <CardDescription className="text-base">{dateRange}</CardDescription>
             </div>
             <Button variant="ghost" size="icon" onClick={onClose}>

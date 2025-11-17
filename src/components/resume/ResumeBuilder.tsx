@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Download, Edit2, Save, X } from 'lucide-react'
-import { experiences } from '@/data/experiences'
+import { useExperiences } from '@/hooks/useExperiences'
 import { alexProfile } from '@/data/alexProfile'
 import { generateResumeFromExperiences } from '@/lib/resumeGenerator'
 import type { ResumeData } from '@/types'
@@ -10,11 +10,12 @@ import { formatDateRange } from '@/lib/dateUtils'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 
 export function ResumeBuilder() {
+  const { experiences } = useExperiences()
   const [isEditing, setIsEditing] = useState(false)
   const [resumeData, setResumeData] = useLocalStorage<ResumeData | null>('resume-data', null)
 
   // Generate initial resume from experiences
-  const generatedResume = useMemo(() => generateResumeFromExperiences(experiences), [])
+  const generatedResume = useMemo(() => generateResumeFromExperiences(experiences), [experiences])
   const displayResume = resumeData || generatedResume
 
   const handleEdit = () => {
