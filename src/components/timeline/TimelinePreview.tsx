@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { TimelineCard } from './TimelineCard'
 import { TimelinePathSVG, getTimelinePath } from './TimelinePath'
 import { SpecialEventMarker } from './SpecialEventMarker'
-import type { Experience, Resource } from '@/types'
+import type { Experience } from '@/types'
 import { alexProfile } from '@/data/alexProfile'
 import { resources } from '@/data/resources'
 import { specialEvents } from '@/data/specialEvents'
+
+interface TimelinePreviewProps {
+  experiences: Experience[]
+}
 
 // Calculate position along path (0 to 1) based on grade level
 const getGradePosition = (gradeLevel: number): number => {
@@ -23,8 +27,8 @@ export function TimelinePreview({ experiences }: TimelinePreviewProps) {
   // Get past experiences (1-2 most recent)
   const pastExperiences = useMemo(() => {
     return experiences
-      .filter(exp => exp.gradeLevel <= currentGrade)
-      .sort((a, b) => {
+      .filter((exp: Experience) => exp.gradeLevel <= currentGrade)
+      .sort((a: Experience, b: Experience) => {
         const dateA = new Date(a.startDate).getTime()
         const dateB = new Date(b.startDate).getTime()
         return dateB - dateA // Most recent first
@@ -115,7 +119,7 @@ export function TimelinePreview({ experiences }: TimelinePreviewProps) {
         </div>
 
         {/* Past Experience Cards - positioned before "You are here" */}
-        {pastExperiences.map((experience, index) => {
+        {pastExperiences.map((experience: Experience) => {
           const t = getGradePosition(experience.gradeLevel)
           const point = pathHelpers.getPointOnPath(t)
           

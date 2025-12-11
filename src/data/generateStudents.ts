@@ -1,4 +1,4 @@
-import type { StudentProfile } from '../types'
+import type { StudentProfile, CollegeApplication, Essay, FinancialAidApplication } from '../types'
 
 // Helper function to generate additional students
 export function generateStudentsForGrade(grade: number, startId: number, count: number): StudentProfile[] {
@@ -173,7 +173,7 @@ export function generateStudentsForGrade(grade: number, startId: number, count: 
     const intendedMajor = grade >= 11 && Math.random() > 0.4 ? careerGoals[0] : undefined
 
     // College applications (only for grades 11-12)
-    const collegeApplications = []
+    const collegeApplications: CollegeApplication[] = []
     if (grade >= 11) {
       const colleges = ['Boston University', 'Northeastern University', 'UMass Boston', 'Boston College', 'Harvard University', 'MIT', 'Tufts University', 'Emerson College', 'Berklee College of Music', 'Wentworth Institute']
       const numApplications = grade === 11 ? Math.floor(Math.random() * 3) : Math.floor(Math.random() * 5) + 2
@@ -194,26 +194,28 @@ export function generateStudentsForGrade(grade: number, startId: number, count: 
     }
 
     // Essays (only for grades 11-12)
-    const essays = []
+    const essays: Essay[] = []
     if (grade >= 11 && collegeApplications.length > 0) {
+      const essayStatus: 'draft' | 'in-progress' | 'submitted' = grade === 11 ? (Math.random() > 0.5 ? 'draft' : 'in-progress') : (Math.random() > 0.7 ? 'submitted' : 'in-progress')
       essays.push({
         id: `essay-${idCounter}`,
         title: 'Common App Personal Statement',
         prompt: 'Tell us about yourself',
         wordCount: Math.floor(Math.random() * 300) + 200,
         targetWordCount: 650,
-        status: grade === 11 ? (Math.random() > 0.5 ? 'draft' : 'in-progress') : (Math.random() > 0.7 ? 'submitted' : 'in-progress'),
+        status: essayStatus,
         deadline: grade === 11 ? '2025-01-15' : '2024-11-01'
       })
     }
 
     // Financial aid applications (only for grades 11-12)
-    const financialAidApplications = []
+    const financialAidApplications: FinancialAidApplication[] = []
     if (grade >= 11) {
+      const faStatus: 'not-started' | 'in-progress' | 'submitted' = grade === 11 ? 'not-started' : (Math.random() > 0.5 ? 'submitted' : 'in-progress')
       financialAidApplications.push({
         id: `fa-${idCounter}`,
         type: 'FAFSA' as const,
-        status: grade === 11 ? 'not-started' : (Math.random() > 0.5 ? 'submitted' : 'in-progress'),
+        status: faStatus,
         deadline: '2025-03-01',
         ...(grade === 12 && Math.random() > 0.5 ? { submittedDate: '2024-10-10' } : {})
       })
