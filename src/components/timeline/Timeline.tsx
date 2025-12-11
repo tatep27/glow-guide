@@ -36,7 +36,7 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
         const calculatedWidth = Math.max(parentWidth - 100, 2000) // Ensure minimum width
         setDimensions({
           width: calculatedWidth,
-          height: 400,
+          height: 500, // Increased from 400 to give more vertical space
         })
       }
     }
@@ -147,21 +147,23 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
       <div className="border-3 border-primary/30 rounded-3xl p-8 bg-card/50">
         <div
           ref={containerRef}
-          className="relative overflow-x-auto overflow-y-visible pb-32 pt-20 scroll-smooth w-full"
+          className="relative overflow-x-auto overflow-y-visible pb-40 pt-32 scroll-smooth w-full"
           style={{ scrollbarWidth: 'thin' }}
         >
         <div 
           className="relative"
           style={{ 
             width: `${dimensions.width + 300}px`, // Add padding to total width
-            height: `${dimensions.height}px`,
-            minHeight: '600px',
+            height: `${dimensions.height + 200}px`, // Increased height to accommodate cards
+            minHeight: '800px', // Increased from 600px to prevent card cutoff
             paddingLeft: '150px', // Add left padding so cards aren't cut off
             paddingRight: '150px', // Add right padding
+            paddingTop: '100px', // Add top padding for cards above timeline
+            paddingBottom: '100px', // Add bottom padding for cards below timeline
           }}
         >
           {/* SVG Path - offset by padding */}
-          <div style={{ position: 'absolute', left: '150px', top: 0 }}>
+          <div style={{ position: 'absolute', left: '150px', top: '100px' }}>
             <TimelinePathSVG 
               width={dimensions.width} 
               height={dimensions.height} 
@@ -181,8 +183,8 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
             
             return pastExperiences.map((experience, index) => {
               const position = experiencePositions[index]
-            // Adjust for padding offset
-            const adjustedPosition = { x: position.x + 150, y: position.y }
+            // Adjust for padding offset (horizontal and vertical)
+            const adjustedPosition = { x: position.x + 150, y: position.y + 100 }
 
               return (
                 <div
@@ -224,8 +226,8 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
             
             return suggestedResources.map((resource, index) => {
               const position = resourcePositions[index]
-            // Adjust for padding offset
-            const adjustedPosition = { x: position.x + 150, y: position.y }
+            // Adjust for padding offset (horizontal and vertical)
+            const adjustedPosition = { x: position.x + 150, y: position.y + 100 }
             
             return (
               <div
@@ -257,8 +259,8 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
               return acc
             }, {} as Record<number, typeof timelineEvents>)
             
-            // Timeline center Y is always at dimensions.height / 2
-            const timelineCenterY = dimensions.height / 2
+            // Timeline center Y is always at dimensions.height / 2, adjusted for padding
+            const timelineCenterY = dimensions.height / 2 + 100
             
             return timelineEvents.map((event) => {
               // For graduation events at 12th grade, position to the left of the grade marker
@@ -309,7 +311,7 @@ export function Timeline({ experiences, resources, onExperienceClick, onResource
             className="absolute z-20"
             style={{
               left: `${dimensions.width - 100 + 150}px`, // Adjust for padding
-              top: `${dimensions.height / 2 - 200}px`, // Moved up more
+              top: `${dimensions.height / 2 - 200 + 100}px`, // Adjust for vertical padding
               transform: 'translateY(-50%)',
             }}
           >

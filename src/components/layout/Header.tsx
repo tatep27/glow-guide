@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { Settings } from 'lucide-react'
 import { useViewMode } from '@/hooks/useViewMode'
 
 export function Header() {
@@ -49,7 +50,7 @@ export function Header() {
             </div>
           </div>
           {isStudentView && (
-            <nav className="flex gap-4">
+            <nav className="flex gap-4 items-center">
               <Link to="/">
                 <Button variant="ghost">Dashboard</Button>
               </Link>
@@ -64,6 +65,11 @@ export function Header() {
               </Link>
               <Link to="/forums">
                 <Button variant="ghost">Forums</Button>
+              </Link>
+              <Link to="/preferences">
+                <Button variant="ghost" size="icon" title="Preferences">
+                  <Settings className="h-4 w-4" />
+                </Button>
               </Link>
             </nav>
           )}

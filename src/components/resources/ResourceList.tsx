@@ -18,7 +18,7 @@ export function ResourceList({ resources, title, showMatchReason = false, onReso
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <h2 className="text-2xl font-bold text-foreground">
           {title}
         </h2>
         <Badge variant="secondary" className="text-base px-3 py-1">{resources.length}</Badge>

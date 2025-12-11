@@ -1,9 +1,18 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { alexProfile } from '@/data/alexProfile'
-import { ArrowRight, FileText, Settings, Plus } from 'lucide-react'
+import { ArrowRight, FileText } from 'lucide-react'
+import { useExperiences } from '@/hooks/useExperiences'
+import { TimelinePreview } from '@/components/timeline/TimelinePreview'
 
 export function DashboardPage() {
+  const navigate = useNavigate()
+  const { experiences } = useExperiences()
+
+  const handleTimelineClick = () => {
+    navigate('/timeline')
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -16,36 +25,35 @@ export function DashboardPage() {
         </p>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
-          <Link to="/add-experience">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Add New Experience</h3>
-                  <p className="text-muted-foreground">Document activities, volunteer work, jobs, or awards</p>
-                </div>
-                <Plus className="h-6 w-6 text-primary" />
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
+      {/* Timeline Preview Card - Large, Full Width */}
+      <Card 
+        className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer"
+        onClick={handleTimelineClick}
+      >
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-2xl font-bold mb-2">View Your Timeline</h3>
+              <p className="text-muted-foreground">See your journey and explore next steps</p>
+            </div>
+            <ArrowRight className="h-8 w-8 text-primary" />
+          </div>
+          
+          {/* Timeline Preview */}
+          <div 
+            className="mt-4"
+            onClick={(e) => {
+              // Prevent card click when interacting with preview
+              e.stopPropagation()
+            }}
+          >
+            <TimelinePreview experiences={experiences} />
+          </div>
+        </CardContent>
+      </Card>
 
-        <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
-          <Link to="/timeline">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">View Your Timeline</h3>
-                  <p className="text-muted-foreground">See your journey and explore next steps</p>
-                </div>
-                <ArrowRight className="h-6 w-6 text-primary" />
-              </div>
-            </CardContent>
-          </Link>
-        </Card>
-
+      {/* Other Quick Actions - Resources, Resume, Forums */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
           <Link to="/resources">
             <CardContent className="p-6">
@@ -75,14 +83,14 @@ export function DashboardPage() {
         </Card>
 
         <Card className="border-3 border-primary/30 rounded-3xl hover:shadow-2xl transition-all cursor-pointer">
-          <Link to="/preferences">
+          <Link to="/forums">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold mb-2">Update Preferences</h3>
-                  <p className="text-muted-foreground">Customize your opportunity recommendations</p>
+                  <h3 className="text-xl font-bold mb-2">Forums</h3>
+                  <p className="text-muted-foreground">Connect with peers and counselors</p>
                 </div>
-                <Settings className="h-6 w-6 text-primary" />
+                <ArrowRight className="h-6 w-6 text-primary" />
               </div>
             </CardContent>
           </Link>
