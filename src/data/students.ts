@@ -1,6 +1,7 @@
 import type { StudentProfile } from '../types'
+import { generateStudentsForGrade } from './generateStudents'
 
-export const students: StudentProfile[] = [
+const baseStudents: StudentProfile[] = [
   // Freshman (Grade 9)
   {
     id: 'student-1',
@@ -511,4 +512,17 @@ export const students: StudentProfile[] = [
   },
 ]
 
+// Generate additional students to reach ~50 per grade
+const additionalFreshmen = generateStudentsForGrade(9, 9, 48) // 2 existing + 48 new = 50
+const additionalSophomores = generateStudentsForGrade(10, 57, 48) // 2 existing + 48 new = 50
+const additionalJuniors = generateStudentsForGrade(11, 105, 48) // 2 existing + 48 new = 50
+const additionalSeniors = generateStudentsForGrade(12, 153, 48) // 2 existing + 48 new = 50
+
+export const students: StudentProfile[] = [
+  ...baseStudents,
+  ...additionalFreshmen,
+  ...additionalSophomores,
+  ...additionalJuniors,
+  ...additionalSeniors,
+]
 
